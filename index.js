@@ -143,10 +143,15 @@ app.get('/listserv',(req,res)=>{
   })
 })
 
+
 app.delete('/deleteserv/:id',(req,res, next)=>{
   Servico.destroy({where:{'id':req.params.id}}).then(()=>{
   })
   
+})
+app.delete('/deletfun/:id',(req,res, next)=>{
+  Funcionario.destroy({where:{'id':req.params.id}}).then(()=>{
+  })
 })
 app.delete('/deleteOs/:id',(req,res, next)=>{
   OrdemService.destroy({where:{'id':req.params.id}}).then(()=>{
@@ -321,6 +326,7 @@ app.get('/listosneg',(req,res)=>{
   res.send(o)
 })
 })
+
 app.get('/listosfin',(req,res)=>{
   OrdemService.findAll({where:{STATUS:['Finalizado']},order: [
     ['id', 'DESC'], 
