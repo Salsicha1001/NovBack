@@ -43,6 +43,9 @@ const OrdemService = db.sql.define('OrdemService',{
           key: 'id'
         }
     },
+    DATACOMP:{
+        type:db.Sequelize.DATE
+    },
     DATEI : {
         type:db.Sequelize.STRING
     },

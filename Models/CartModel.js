@@ -29,7 +29,13 @@ const Cart = db.sql.define('CART',{
       },
       CODVERIF:{
         type:db.Sequelize.INTEGER
-    }  
+    }  ,
+    GANHOFUN:{
+      type:db.Sequelize.DOUBLE
+  },
+  LUCRO:{
+          type:db.Sequelize.DOUBLE
+      },
     });
     
   //Cart.sync({})

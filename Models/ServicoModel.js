@@ -16,7 +16,7 @@ const Servico = db.sql.define('SERVICO',{
     LUCRO : {
         type:db.Sequelize.INTEGER
     },
-    GANHODONO : {
+    GANHO : {
         type:db.Sequelize.DOUBLE
     },
     GANHOFUN : {

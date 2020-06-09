@@ -27,6 +27,9 @@ const Product = db.sql.define('Product',{
     },
     CODVERIF:{
         type:db.Sequelize.INTEGER
+    },
+    GANHO:{
+        type:db.Sequelize.DOUBLE
     }
 
     

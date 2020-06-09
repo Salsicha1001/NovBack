@@ -1,5 +1,6 @@
 const express = require('express');
 const app = express();
+const Sequelize = require('sequelize')
 const bodyParser = require('body-parser')
 const mysql = require("mysql")
 const Client = require('./Models/ClientModel')
@@ -11,8 +12,9 @@ const Product = require('./Models/Products')
 const OrdemService = require('./Models/OrderService')
 const Cart = require('./Models/CartModel')
 const Pag = require('./Models/PagModel')
-
-
+const db = require('./Conect/conection')
+const Op = Sequelize.Op;
+const moment = require('moment');
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({extend:true}))
 app.use(bodyParser.json());
@@ -71,13 +73,17 @@ c.save((err, cliente)=>{
       app.post('/savecart',(req,res, next)=>{
        
         for(let key in req.body.item){
+          console.log(req.body.item[key].GANHO)
+        
        c = new Cart({
           IDOS:req.body.idos,
           NOME:req.body.item[key].NOME,
           PRECODEVENDA:req.body.item[key].PRECODEVENDA,
           totalPrice:req.body.totalPrice,
           totalQtd:req.body.totalQtd,
-          CODVERIF:req.body.CODVERIF
+          CODVERIF:req.body.CODVERIF,
+          LUCRO:req.body.item[key].GANHO,
+          GANHOFUN:req.body.item[key].GANHOFUN
         })
         c.save((err, cart)=>{
           if(err)
@@ -121,7 +127,7 @@ app.post('/saveservico',(req,res,next )=>{
     NOME:req.body.descricao,
     LUCRO:req.body.lucro,
     PRECODEVENDA:req.body.valor,
-    GANHODONO:req.body.ganhodono,
+    GANHO:req.body.ganhodono,
     GANHOFUN:req.body.ganhoFuncionario,
     CODVERIF:Math.floor(Math.random() * 999999)
   })
@@ -267,6 +273,8 @@ app.patch('/addqtd/:id/:id1/:id2',(req,res, next)=>{
     for(let key in req.body.item){
     c.NOME=req.body.item[key].NOME,
     c.PRECODEVENDA=req.body.item[key].PRECODEVENDA,
+    c.LUCRO = req.body.item[key].GANHODONO,
+    c.GANHOFUN = req.body.item[key].GANHOFUN,
     c.totalPrice=req.body.totalPrice,
     c.totalQtd=req.body.totalQtd,
     c.CODVERIF=req.body.CODVERIF
@@ -291,7 +299,8 @@ app.post('/saveProduct', function(req,res, next){
     PRECODECOMPRA: req.body.precoDeCompra,
     PRECODEVENDA:req.body.precoDeVenda,
     LUCRO:req.body.lucro,
-    CODVERIF:Math.floor(Math.random() * 9999999)
+    CODVERIF:Math.floor(Math.random() * 9999999),
+    GANHO:req.body.precoDeVenda - req.body.precoDeCompra
     
   })
 
@@ -326,7 +335,44 @@ app.get('/listosneg',(req,res)=>{
   res.send(o)
 })
 })
+app.get('/getrela/:dia1/:mes1/:ano1/:dia2/:mes2/:ano2',(req,res)=>{
+  var dia1= moment(req.params.ano1+'-'+req.params.mes1+'-'+req.params.dia1)
+ 
+  var dia2= moment(req.params.ano2+'-'+req.params.mes2+'-'+req.params.dia2)
+ var idOs =[]
+ var idfun=[]
+ var codiv =[]
+ 
+  OrdemService.findAll({where:{DATACOMP :{[Op.between]:[dia1 , dia2]}}}).then((o)=>{
+ 
+    for(let key in o ){
+     //console.log(o)
+    idOs.push( o[key].dataValues.id)
+    idfun.push( o[key].dataValues.IDFUNCIONARIO)
+      Cart.findAll({where:{ IDOS: idOs[key]}}).then((c)=>{
+        
+        for(let i in c){
+           var oo=[]
+        oo[i] =o[i].dataValues
+       // console.log(oo)
+          var gg=[]
+        gg[i] =c[i].dataValues
+       // console.log(gg)
+          //console.log(c[i].dataValues)
+          codiv.push(c[i].dataValues.CODVERIF)
+          //console.log(codiv[i])
+        
+       
+      
+      
+      
 
+  }
+ 
+  })
+    }
+  })
+})
 app.get('/listosfin',(req,res)=>{
   OrdemService.findAll({where:{STATUS:['Finalizado']},order: [
     ['id', 'DESC'], 
@@ -356,6 +402,7 @@ app.post('/saveos',(req,res, next)=>{
       OBS:req.body.OBS,
       IDCLIENT:req.body.IDCLIENT,
       IDFUNCIONARIO:req.body.IDFUNCIONARIO,
+      DATACOMP:Date.now(),
       STATUS:'Espera'
     })
 
@@ -368,7 +415,7 @@ app.post('/saveos',(req,res, next)=>{
       next()
     })
 
-    
+    next()
 
 })
 
