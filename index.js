@@ -69,6 +69,11 @@ c.save((err, cliente)=>{
             res.send(r)
           })
         })
+        app.get('/getcartsrel/:id',(req,res)=>{
+          Cart.findAll({where:{'IDOS':req.params.id}}).then((r)=>{
+            res.send(r)
+          })
+        })
 
       app.post('/savecart',(req,res, next)=>{
        
@@ -335,44 +340,18 @@ app.get('/listosneg',(req,res)=>{
   res.send(o)
 })
 })
-app.get('/getrela/:dia1/:mes1/:ano1/:dia2/:mes2/:ano2',(req,res)=>{
+app.get('/getrela/:fun/:dia1/:mes1/:ano1/:dia2/:mes2/:ano2',(req,res)=>{
   var dia1= moment(req.params.ano1+'-'+req.params.mes1+'-'+req.params.dia1)
- 
+ var fun= req.params.fun
   var dia2= moment(req.params.ano2+'-'+req.params.mes2+'-'+req.params.dia2)
- var idOs =[]
- var idfun=[]
- var codiv =[]
  
-  OrdemService.findAll({where:{DATACOMP :{[Op.between]:[dia1 , dia2]}}}).then((o)=>{
  
-    for(let key in o ){
-     //console.log(o)
-    idOs.push( o[key].dataValues.id)
-    idfun.push( o[key].dataValues.IDFUNCIONARIO)
-      Cart.findAll({where:{ IDOS: idOs[key]}}).then((c)=>{
-        
-        for(let i in c){
-           var oo=[]
-        oo[i] =o[i].dataValues
-       // console.log(oo)
-          var gg=[]
-        gg[i] =c[i].dataValues
-       // console.log(gg)
-          //console.log(c[i].dataValues)
-          codiv.push(c[i].dataValues.CODVERIF)
-          //console.log(codiv[i])
-        
-       
-      
-      
-      
-
-  }
- 
-  })
-    }
+  OrdemService.findAll({where:{'FUNCIONARIO':fun ,'DATACOMP':{[Op.between]:[dia2 , dia1]}}}).then((o)=>{
+    res.send(o)
+    
   })
 })
+
 app.get('/listosfin',(req,res)=>{
   OrdemService.findAll({where:{STATUS:['Finalizado']},order: [
     ['id', 'DESC'], 

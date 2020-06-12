@@ -10,7 +10,7 @@ var test = sql.authenticate()
         console.log("CONNECTED! ");
     })
     .catch(function (err) {
-        console.log("SOMETHING DONE GOOFED");
+        console.log(err);
     })
     .done();
 
