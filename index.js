@@ -351,6 +351,16 @@ app.get('/getrela/:fun/:dia1/:mes1/:ano1/:dia2/:mes2/:ano2',(req,res)=>{
     
   })
 })
+app.get('/getreladono/:dia1/:mes1/:ano1/:dia2/:mes2/:ano2',(req,res)=>{
+  var dia1= req.params.ano1+'-'+req.params.mes1+'-'+req.params.dia1
+  var dia2= req.params.ano2+'-'+req.params.mes2+'-'+req.params.dia2
+ 
+ 
+  OrdemService.findAll({where:{DATACOMP:{[Op.between]:[dia1 , dia2]}}}).then((o)=>{
+  res.send(o)
+    
+ })
+})
 
 app.get('/listosfin',(req,res)=>{
   OrdemService.findAll({where:{STATUS:['Finalizado']},order: [
